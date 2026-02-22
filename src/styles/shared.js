@@ -1,0 +1,155 @@
+import { StyleSheet } from 'react-native';
+import COLORS from '../constants/colors';
+
+const sharedStyles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: COLORS.surface,
+    },
+    screenContainer: {
+        flex: 1,
+        backgroundColor: COLORS.surface,
+    },
+    scrollContent: {
+        flexGrow: 1,
+        paddingHorizontal: 32,
+    },
+    header: {
+        paddingTop: 20,
+        marginBottom: 24,
+        alignItems: 'center',
+    },
+    content: {
+        paddingTop: 32,
+    },
+    title: {
+        fontFamily: 'PlayfairDisplay_700Bold',
+        fontSize: 32,
+        color: COLORS.text,
+        marginBottom: 32,
+        letterSpacing: -0.8,
+        lineHeight: 42,
+    },
+    bodyText: {
+        fontFamily: 'Inter_400Regular',
+        fontSize: 16,
+        color: '#6B7280',
+        lineHeight: 24,
+        marginBottom: 32,
+    },
+    footer: {
+        paddingHorizontal: 32,
+        paddingBottom: 48,
+        flexDirection: 'row',
+        alignItems: 'flex-end',
+        justifyContent: 'space-between',
+    },
+    pillButton: {
+        backgroundColor: COLORS.black,
+        borderRadius: 30,
+        height: 58,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 10,
+        shadowColor: COLORS.black,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.06,
+        shadowRadius: 12,
+        elevation: 2,
+    },
+    primaryButton: {
+        backgroundColor: COLORS.black,
+        borderRadius: 30,
+        height: 58,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 10,
+        shadowColor: COLORS.black,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.06,
+        shadowRadius: 12,
+        elevation: 2,
+    },
+    pillButtonText: {
+        fontFamily: 'Inter_600SemiBold',
+        fontSize: 16,
+        color: COLORS.white,
+    },
+    fab: {
+        width: 68,
+        height: 68,
+        borderRadius: 34,
+        backgroundColor: COLORS.black,
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.06,
+        shadowRadius: 12,
+        elevation: 3,
+    },
+    visibilityToggleRowStandalone: {
+        marginTop: 10,
+        marginBottom: 20,
+    },
+    intentionList: {
+        marginTop: 10,
+    },
+    intentionOption: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 18,
+        borderBottomWidth: 1,
+        borderBottomColor: '#F3F4F6',
+    },
+    skipButtonText: {
+        fontFamily: 'Inter_600SemiBold',
+        fontSize: 13,
+        color: '#9CA3AF',
+        letterSpacing: 1.5,
+    },
+    underlinedInputContainer: {
+        borderBottomWidth: 2,
+        borderBottomColor: COLORS.black,
+        marginBottom: 24,
+    },
+    stepIndicatorArea: {
+        paddingHorizontal: 0,
+        marginBottom: 8,
+    },
+    chapterLabel: {
+        fontFamily: 'Inter_600SemiBold',
+        fontSize: 11,
+        color: '#9CA3AF',
+        letterSpacing: 1.5,
+        textTransform: 'uppercase',
+        marginBottom: 12,
+    },
+    progressRow: {
+        marginTop: 4,
+        marginBottom: 12,
+    },
+    progressTrack: {
+        height: 2,
+        backgroundColor: '#E5E7EB',
+        borderRadius: 1,
+        overflow: 'hidden',
+    },
+    progressFill: {
+        height: 2,
+        backgroundColor: COLORS.black,
+        borderRadius: 1,
+    },
+    footerHelperText: {
+        fontFamily: 'Inter_400Regular',
+        fontSize: 13,
+        color: '#9CA3AF',
+        flex: 1,
+        paddingRight: 16,
+        lineHeight: 18,
+    },
+});
+
+export default sharedStyles;
