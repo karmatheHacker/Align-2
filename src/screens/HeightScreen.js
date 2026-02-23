@@ -1,24 +1,37 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Animated, StyleSheet } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useOnboarding } from '../context/OnboardingContext';
 import StepIndicator from '../components/StepIndicator';
-import BackButton from '../components/BackButton';
 import FAB from '../components/FAB';
 import VisibilityToggle from '../components/VisibilityToggle';
+import VisibilityInfoSheet from '../components/VisibilityInfoSheet';
 import PremiumScreenWrapper from '../components/PremiumScreenWrapper';
 import COLORS from '../constants/colors';
 import { STEP_ORDER } from '../constants/steps';
+import SPACING from '../constants/spacing';
 import sharedStyles from '../styles/shared';
 
 const HeightScreen = ({ onNext, onBack }) => {
     const { dispatch } = useOnboarding();
     const [unit, setUnit] = useState('FT');
-    const [selectedHeight, setSelectedHeight] = useState(70);
+    const [selectedHeight, setSelectedHeight] = useState(70); // 5'10" default
     const [isVisible, setIsVisible] = useState(true);
+    const [infoSheetOpen, setInfoSheetOpen] = useState(false);
+
+    const scrollY = useRef(new Animated.Value(0)).current;
+    const scrollRef = useRef(null);
+    const ITEM_HEIGHT = 80;
 
     const currentIndex = STEP_ORDER.indexOf('height');
     const totalSteps = STEP_ORDER.length;
+
+    const heightOptions = unit === 'FT'
+        ? Array.from({ length: 37 }, (_, i) => i + 48) // 4'0" (48) to 7'0" (84)
+        : Array.from({ length: 91 }, (_, i) => i + 120); // 120cm to 210cm
+
+    // C-7: Deleted console.log for height options
 
     const handleNext = () => {
         dispatch({ type: 'SET_FIELD', field: 'height', value: { value: selectedHeight, unit } });
@@ -26,89 +39,164 @@ const HeightScreen = ({ onNext, onBack }) => {
         onNext();
     };
 
-    const scrollRef = useRef(null);
-    const ITEM_HEIGHT = 80;
-
-    const heights = unit === 'FT'
-        ? Array.from({ length: 49 }, (_, i) => i + 48)
-        : Array.from({ length: 124 }, (_, i) => i + 121);
+    const handleSkip = () => {
+        dispatch({ type: 'SET_FIELD', field: 'height', value: null });
+        onNext();
+    };
 
     const handleUnitToggle = (newUnit) => {
         if (unit === newUnit) return;
         let newValue = newUnit === 'CM' ? Math.round(selectedHeight * 2.54) : Math.round(selectedHeight / 2.54);
         setUnit(newUnit);
         setSelectedHeight(newValue);
-        const newList = newUnit === 'FT'
-            ? Array.from({ length: 49 }, (_, i) => i + 48)
-            : Array.from({ length: 124 }, (_, i) => i + 121);
-        const index = newList.indexOf(newValue);
-        if (index !== -1) setTimeout(() => { scrollRef.current?.scrollTo({ y: index * ITEM_HEIGHT, animated: false }); }, 10);
     };
 
-    const onScrollEnd = (event) => {
+    // Auto-scroll on mount and unit change
+    React.useEffect(() => {
+        const scrollToDefault = () => {
+            const index = heightOptions.indexOf(selectedHeight);
+            if (index !== -1) {
+                scrollRef.current?.scrollTo({ y: index * ITEM_HEIGHT, animated: false });
+            }
+        };
+
+        // Run immediately and with a small delay for mount stability
+        scrollToDefault();
+        const timer = setTimeout(scrollToDefault, 100);
+        return () => clearTimeout(timer);
+    }, [unit]);
+
+    const onScroll = Animated.event(
+        [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+        { useNativeDriver: true }
+    );
+
+    const onMomentumScrollEnd = (event) => {
         const y = event.nativeEvent.contentOffset.y;
         const index = Math.round(y / ITEM_HEIGHT);
-        if (heights[index]) setSelectedHeight(heights[index]);
+        if (heightOptions[index]) {
+            setSelectedHeight(heightOptions[index]);
+        }
     };
 
     return (
         <View style={sharedStyles.screenContainer}>
-            <View style={sharedStyles.header}>
-                <View style={{ height: 11 }} />
-            </View>
-            <View style={styles.topActions}>
-                <BackButton onPress={onBack} />
-                <View style={{ flex: 1 }}>
-                    <StepIndicator currentIndex={currentIndex} totalSteps={totalSteps} />
-                </View>
-                <TouchableOpacity onPress={onNext} style={styles.skipContainer}>
-                    <Text style={styles.skipButtonText}>SKIP</Text>
-                </TouchableOpacity>
-            </View>
-            <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
-                <PremiumScreenWrapper>
+            <StepIndicator
+                currentIndex={currentIndex}
+                totalSteps={totalSteps}
+                onBack={onBack}
+                rightAction={
+                    <TouchableOpacity onPress={handleSkip} style={styles.skipContainer}>
+                        <Text style={styles.skipButtonText} numberOfLines={1}>SKIP</Text>
+                    </TouchableOpacity>
+                }
+            />
+            <ScrollView contentContainerStyle={sharedStyles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+                <PremiumScreenWrapper animateEntrance>
                     <View style={sharedStyles.content}>
                         <Text style={[sharedStyles.title, { textAlign: 'center' }]}>Your natural stature</Text>
-                        <Text style={[sharedStyles.bodyText, { textAlign: 'center', marginTop: -20, marginBottom: 40 }]}>How you stand in the world.</Text>
-                        <View style={styles.staturePickerContainer}>
-                            <View style={styles.staturePickerHero}>
-                                <LinearGradient colors={[COLORS.surface, 'transparent', 'transparent', COLORS.surface]} locations={[0, 0.2, 0.8, 1]} style={styles.pickerGradientOverlay} pointerEvents="none" />
-                                <View style={styles.pickerSelectionRing} pointerEvents="none" />
-                                <ScrollView ref={scrollRef} showsVerticalScrollIndicator={false} snapToInterval={ITEM_HEIGHT} decelerationRate="fast" onMomentumScrollEnd={onScrollEnd} contentContainerStyle={{ paddingVertical: 160 }}>
-                                    {heights.map((item) => {
-                                        const isActive = selectedHeight === item;
-                                        return (
-                                            <View key={`${unit}-${item}`} style={[styles.statureItem, { height: ITEM_HEIGHT }]}>
-                                                <Text style={[styles.statureValue, isActive && styles.statureValueActive]}>
-                                                    {unit === 'FT' ? (
-                                                        <React.Fragment>
-                                                            <Text style={styles.statureMainValue}>{Math.floor(item / 12)}</Text>
-                                                            <Text style={styles.statureSubValue}>ft </Text>
-                                                            <Text style={styles.statureMainValue}>{item % 12}</Text>
-                                                            <Text style={styles.statureSubValue}>in</Text>
-                                                        </React.Fragment>
-                                                    ) : (
-                                                        <React.Fragment>
-                                                            <Text style={styles.statureMainValue}>{item}</Text>
-                                                            <Text style={styles.statureSubValue}> cm</Text>
-                                                        </React.Fragment>
-                                                    )}
-                                                </Text>
-                                            </View>
-                                        );
-                                    })}
-                                </ScrollView>
+                        <Text style={[sharedStyles.bodyText, { textAlign: 'center', marginBottom: SPACING.md }]}>
+                            How you stand in the world.
+                        </Text>
+
+                        {/* Unit Toggle Row */}
+                        <View style={styles.unitToggleRow}>
+                            <TouchableOpacity onPress={() => handleUnitToggle('FT')} style={styles.arrowButton}>
+                                <Feather name="chevron-left" size={24} color={unit === 'FT' ? COLORS.black : '#D1D5DB'} />
+                            </TouchableOpacity>
+                            <View style={styles.unitLabels}>
+                                <Text style={[styles.unitText, unit === 'FT' && styles.unitTextActive]}>FT</Text>
+                                <Text style={styles.unitDivider}>/</Text>
+                                <Text style={[styles.unitText, unit === 'CM' && styles.unitTextActive]}>CM</Text>
                             </View>
-                            <View style={styles.statureUnitPill}>
-                                <TouchableOpacity style={[styles.statureUnitBtn, unit === 'FT' && styles.statureUnitBtnActive]} onPress={() => handleUnitToggle('FT')}>
-                                    <Text style={[styles.statureUnitLabel, unit === 'FT' && styles.statureUnitLabelActive]}>FT / IN</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={[styles.statureUnitBtn, unit === 'CM' && styles.statureUnitBtnActive]} onPress={() => handleUnitToggle('CM')}>
-                                    <Text style={[styles.statureUnitLabel, unit === 'CM' && styles.statureUnitLabelActive]}>CENTIMETERS</Text>
-                                </TouchableOpacity>
-                            </View>
+                            <TouchableOpacity onPress={() => handleUnitToggle('CM')} style={styles.arrowButton}>
+                                <Feather name="chevron-right" size={24} color={unit === 'CM' ? COLORS.black : '#D1D5DB'} />
+                            </TouchableOpacity>
                         </View>
-                        <VisibilityToggle isVisible={isVisible} onToggle={() => setIsVisible(!isVisible)} activeColor={COLORS.black} style={{ marginTop: 40 }} />
+
+                        <View style={styles.staturePickerHero}>
+                            <View style={styles.pickerSelectionRing} pointerEvents="none" />
+                            <Animated.ScrollView
+                                ref={scrollRef}
+                                showsVerticalScrollIndicator={false}
+                                snapToInterval={ITEM_HEIGHT}
+                                decelerationRate="fast"
+                                onScroll={onScroll}
+                                onMomentumScrollEnd={onMomentumScrollEnd}
+                                scrollEventThrottle={16}
+                                contentContainerStyle={{ paddingVertical: 160 }}
+                                style={{ flex: 1 }}
+                                nestedScrollEnabled={true}
+                            >
+                                {heightOptions.map((item, index) => {
+                                    const inputRange = [
+                                        (index - 2) * ITEM_HEIGHT,
+                                        (index - 1) * ITEM_HEIGHT,
+                                        index * ITEM_HEIGHT,
+                                        (index + 1) * ITEM_HEIGHT,
+                                        (index + 2) * ITEM_HEIGHT,
+                                    ];
+
+                                    const opacity = scrollY.interpolate({
+                                        inputRange,
+                                        outputRange: [0.2, 0.5, 1, 0.5, 0.2],
+                                        extrapolate: 'clamp',
+                                    });
+
+                                    const scale = scrollY.interpolate({
+                                        inputRange,
+                                        outputRange: [0.8, 0.9, 1.1, 0.9, 0.8],
+                                        extrapolate: 'clamp',
+                                    });
+
+                                    return (
+                                        <Animated.View
+                                            key={`${unit}-${item}`}
+                                            style={[
+                                                styles.statureItem,
+                                                { height: ITEM_HEIGHT, opacity, transform: [{ scale }] }
+                                            ]}
+                                        >
+                                            {unit === 'FT' ? (
+                                                <Text style={styles.statureText}>
+                                                    <Text style={styles.statureMainValue}>{Math.floor(item / 12)}</Text>
+                                                    <Text style={styles.statureSubValue}>ft </Text>
+                                                    <Text style={styles.statureMainValue}>{item % 12}</Text>
+                                                    <Text style={styles.statureSubValue}>in</Text>
+                                                </Text>
+                                            ) : (
+                                                <Text style={styles.statureText}>
+                                                    <Text style={styles.statureMainValue}>{item}</Text>
+                                                    <Text style={styles.statureSubValue}> cm</Text>
+                                                </Text>
+                                            )}
+                                        </Animated.View>
+                                    );
+                                })}
+                            </Animated.ScrollView>
+                            <LinearGradient
+                                colors={[COLORS.surface, 'transparent', 'transparent', COLORS.surface]}
+                                locations={[0, 0.1, 0.9, 1]}
+                                style={StyleSheet.absoluteFillObject}
+                                pointerEvents="none"
+                            />
+                        </View>
+
+                        <View style={sharedStyles.visibilityToggleRowStandalone}>
+                            <VisibilityToggle
+                                isVisible={isVisible}
+                                onToggle={() => setIsVisible(!isVisible)}
+                                onInfoPress={() => setInfoSheetOpen(true)}
+                                activeColor={COLORS.black}
+                            />
+                        </View>
+                        {infoSheetOpen && (
+                            <VisibilityInfoSheet
+                                fieldName="height"
+                                isVisible={isVisible}
+                                onClose={() => setInfoSheetOpen(false)}
+                            />
+                        )}
                     </View>
                 </PremiumScreenWrapper>
             </ScrollView>
@@ -124,16 +212,8 @@ const HeightScreen = ({ onNext, onBack }) => {
 };
 
 const styles = StyleSheet.create({
-    topActions: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 28,
-        position: 'relative',
-        zIndex: 10,
-    },
     skipContainer: {
-        position: 'absolute',
-        right: 20,
+        flexShrink: 0,
     },
     skipButtonText: {
         fontFamily: 'Inter_600SemiBold',
@@ -141,53 +221,68 @@ const styles = StyleSheet.create({
         color: '#9CA3AF',
         letterSpacing: 1.5,
     },
-    staturePickerContainer: {
+    unitToggleRow: {
+        flexDirection: 'row',
+        justifyContent: 'center',
         alignItems: 'center',
-        width: '100%',
+        gap: SPACING.md,
+        marginBottom: SPACING.lg,
+    },
+    arrowButton: {
+        width: 44,
+        height: 44,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    unitLabels: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    unitText: {
+        fontFamily: 'Inter_600SemiBold',
+        fontSize: 16,
+        color: '#D1D5DB',
+    },
+    unitTextActive: {
+        color: COLORS.black,
+    },
+    unitDivider: {
+        marginHorizontal: SPACING.sm,
+        color: '#D1D5DB',
+        fontSize: 16,
     },
     staturePickerHero: {
+        height: 380,
         width: '100%',
-        height: 400,
         position: 'relative',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    pickerGradientOverlay: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 5,
+        backgroundColor: COLORS.surface,
+        borderRadius: 24,
+        overflow: 'hidden',
     },
     pickerSelectionRing: {
         position: 'absolute',
         top: '50%',
-        left: 16,
-        right: 16,
+        left: 0,
+        right: 0,
         height: 80,
         marginTop: -40,
-        borderRadius: 16,
+        borderRadius: 20,
         borderWidth: 2,
         borderColor: COLORS.black,
-        backgroundColor: 'rgba(0,0,0,0.03)',
-        pointerEvents: 'none',
+        backgroundColor: 'rgba(0,0,0,0.02)',
+        zIndex: 2,
     },
     statureItem: {
         width: '100%',
         justifyContent: 'center',
         alignItems: 'center',
     },
-    statureValue: {
-        opacity: 0.3,
+    statureText: {
         textAlign: 'center',
-    },
-    statureValueActive: {
-        opacity: 1,
     },
     statureMainValue: {
         fontFamily: 'PlayfairDisplay_700Bold',
-        fontSize: 48,
+        fontSize: 32,
         color: COLORS.text,
     },
     statureSubValue: {
@@ -195,36 +290,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: COLORS.gray,
         textTransform: 'uppercase',
-        letterSpacing: 1,
-    },
-    statureUnitPill: {
-        flexDirection: 'row',
-        backgroundColor: '#F3F4F6',
-        borderRadius: 25,
-        padding: 4,
-        marginTop: 20,
-    },
-    statureUnitBtn: {
-        paddingHorizontal: 20,
-        paddingVertical: 12,
-        borderRadius: 22,
-    },
-    statureUnitBtnActive: {
-        backgroundColor: COLORS.white,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.08,
-        shadowRadius: 10,
-        elevation: 2,
-    },
-    statureUnitLabel: {
-        fontFamily: 'Inter_600SemiBold',
-        fontSize: 12,
-        color: COLORS.gray,
-        letterSpacing: 0.5,
-    },
-    statureUnitLabelActive: {
-        color: COLORS.text,
     },
 });
 

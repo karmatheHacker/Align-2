@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { useOnboarding } from '../context/OnboardingContext';
 import StepIndicator from '../components/StepIndicator';
-import BackButton from '../components/BackButton';
 import FAB from '../components/FAB';
 import OptionRow from '../components/OptionRow';
 import VisibilityToggle from '../components/VisibilityToggle';
+import VisibilityInfoSheet from '../components/VisibilityInfoSheet';
 import PremiumScreenWrapper from '../components/PremiumScreenWrapper';
 import COLORS from '../constants/colors';
+import SPACING from '../constants/spacing';
 import { STEP_ORDER } from '../constants/steps';
 import sharedStyles from '../styles/shared';
 
@@ -16,6 +16,7 @@ const ReligionScreen = ({ onNext, onBack }) => {
     const { dispatch } = useOnboarding();
     const [selectedBeliefs, setSelectedBeliefs] = useState([]);
     const [isVisible, setIsVisible] = useState(true);
+    const [infoSheetOpen, setInfoSheetOpen] = useState(false);
 
     const currentIndex = STEP_ORDER.indexOf('religion');
     const totalSteps = STEP_ORDER.length;
@@ -51,10 +52,7 @@ const ReligionScreen = ({ onNext, onBack }) => {
 
     return (
         <View style={sharedStyles.screenContainer}>
-            <View style={sharedStyles.header}>
-                <BackButton onPress={onBack} />
-            </View>
-            <StepIndicator currentIndex={currentIndex} totalSteps={totalSteps} />
+            <StepIndicator currentIndex={currentIndex} totalSteps={totalSteps} onBack={onBack} />
 
             <ScrollView contentContainerStyle={sharedStyles.scrollContent} showsVerticalScrollIndicator={false}>
                 <PremiumScreenWrapper>
@@ -73,7 +71,7 @@ const ReligionScreen = ({ onNext, onBack }) => {
                                 />
                             ))}
 
-                            <View style={{ marginTop: 24 }}>
+                            <View style={{ marginTop: SPACING.lg }}>
                                 <OptionRow
                                     label="Prefer not to say"
                                     description="This will limit who sees your profile. Learn more"
@@ -85,47 +83,36 @@ const ReligionScreen = ({ onNext, onBack }) => {
                                 />
                             </View>
                         </View>
-
-                        <VisibilityToggle
-                            isVisible={isVisible}
-                            onToggle={() => setIsVisible(!isVisible)}
-                            activeColor={COLORS.black}
-                            style={[styles.visibilityToggleCard, { marginTop: 48 }]}
-                        />
+                        <View style={sharedStyles.visibilityToggleRowStandalone}>
+                            <VisibilityToggle
+                                isVisible={isVisible}
+                                onToggle={() => setIsVisible(!isVisible)}
+                                onInfoPress={() => setInfoSheetOpen(true)}
+                                activeColor={COLORS.black}
+                            />
+                        </View>
+                        {infoSheetOpen && (
+                            <VisibilityInfoSheet
+                                fieldName="religion"
+                                isVisible={isVisible}
+                                onClose={() => setInfoSheetOpen(false)}
+                            />
+                        )}
                     </View>
                 </PremiumScreenWrapper>
             </ScrollView>
 
-            <View style={[styles.p8, { alignItems: 'center' }]}>
-                <Text style={styles.brandingText}>Align © 2024</Text>
-            </View>
-
+            {/* C-5: Deleted "Align © 2024" branding block (dead styles also removed below) */}
             <View style={sharedStyles.footer}>
                 <View style={{ flex: 1 }} />
+                {/* m-1: Fixed </View > trailing space */}
                 <FAB onPress={handleNext} disabled={selectedBeliefs.length === 0} hint="Select your beliefs to continue" />
             </View>
         </View>
     );
 };
 
-const styles = StyleSheet.create({
-    visibilityToggleCard: {
-        padding: 20,
-        backgroundColor: COLORS.white,
-        borderRadius: 16,
-        borderWidth: 1,
-        borderColor: '#F3F4F6',
-    },
-    p8: {
-        padding: 32,
-    },
-    brandingText: {
-        fontSize: 10,
-        fontFamily: 'Inter_700Bold',
-        color: '#D1D5DB',
-        letterSpacing: 2,
-        textAlign: 'center',
-    },
-});
+// C-5: Deleted dead styles visibilityToggleCard, p8, brandingText
+const styles = StyleSheet.create({});
 
 export default ReligionScreen;

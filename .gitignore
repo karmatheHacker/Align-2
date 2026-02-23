@@ -40,3 +40,10 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# coverage
+coverage/
+
+# temp files
+*.txt
+

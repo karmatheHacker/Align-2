@@ -21,6 +21,8 @@ const initialProfile = {
     drinking: null,
     location: null,
     photos: [], // array of URIs
+    publicBio: null,
+    aiBio: null,
     notifications: null,
     isVisible: {
         gender: true,

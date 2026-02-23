@@ -5,6 +5,7 @@ import StepIndicator from '../components/StepIndicator';
 import BackButton from '../components/BackButton';
 import FAB from '../components/FAB';
 import COLORS from '../constants/colors';
+import SPACING from '../constants/spacing';
 import { STEP_ORDER } from '../constants/steps';
 import sharedStyles from '../styles/shared';
 import PremiumScreenWrapper from '../components/PremiumScreenWrapper';
@@ -34,11 +35,8 @@ const BirthdayScreen = ({ onNext, digits, setDigits, onBack }) => {
 
     return (
         <View style={sharedStyles.screenContainer}>
+            <StepIndicator currentIndex={currentIndex} totalSteps={totalSteps} onBack={onBack} />
             <ScrollView contentContainerStyle={sharedStyles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-                <View style={sharedStyles.header}>
-                    <BackButton onPress={onBack} />
-                </View>
-                <StepIndicator currentIndex={currentIndex} totalSteps={totalSteps} />
                 <PremiumScreenWrapper animateEntrance>
                     <View style={sharedStyles.content}>
                         <Text style={sharedStyles.title}>Your story began on</Text>
@@ -51,23 +49,20 @@ const BirthdayScreen = ({ onNext, digits, setDigits, onBack }) => {
                                         placeholderTextColor={COLORS.lightGray} value={digits[i]}
                                         onChangeText={(val) => handleDigitChange(val, i)}
                                         onKeyPress={(e) => handleKeyPress(e, i)} autoFocus={i === 0}
-                                        selectionColor={COLORS.black}
                                     />
                                 ))}
                             </View>
-                            <View style={[styles.digitGroup, { marginLeft: 20 }]}>
+                            <View style={styles.digitGroup}>
                                 {[2, 3].map((i) => (
                                     <TextInput key={i} ref={(ref) => (inputRefs.current[i] = ref)}
                                         style={[styles.dobInput, digits[i] !== '' && styles.dobInputActive]}
                                         keyboardType="number-pad" maxLength={1} placeholder="M"
                                         placeholderTextColor={COLORS.lightGray} value={digits[i]}
                                         onChangeText={(val) => handleDigitChange(val, i)}
-                                        onKeyPress={(e) => handleKeyPress(e, i)}
-                                        selectionColor={COLORS.black}
                                     />
                                 ))}
                             </View>
-                            <View style={[styles.digitGroup, { marginLeft: 20 }]}>
+                            <View style={styles.digitGroup}>
                                 {[4, 5, 6, 7].map((i) => (
                                     <TextInput key={i} ref={(ref) => (inputRefs.current[i] = ref)}
                                         style={[styles.dobInput, digits[i] !== '' && styles.dobInputActive]}
@@ -99,20 +94,22 @@ const styles = StyleSheet.create({
     dobContainer: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '100%',
     },
     digitGroup: {
         flexDirection: 'row',
-        gap: 8,
+        gap: 2, // Tighter gap for better fit
     },
     dobInput: {
-        width: 44,
+        width: 32, // Reduced from 44 to fit smaller screens
         borderBottomWidth: 2,
         borderBottomColor: COLORS.inactiveBorder,
         fontFamily: 'Inter_500Medium',
-        fontSize: 24,
+        fontSize: 18, // Slightly larger font for readability
         color: COLORS.text,
         textAlign: 'center',
-        paddingVertical: 8,
+        paddingVertical: 10,
     },
     dobInputActive: {
         borderBottomColor: COLORS.black,

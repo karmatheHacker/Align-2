@@ -49,7 +49,7 @@ const validateProfile = (profile) => {
     if (!profile.sexuality) errors.sexuality = "Sexual orientation is required.";
     if (!profile.datingIntention) errors.datingIntention = "Dating intention is required.";
     if (!profile.height || !profile.height.value) errors.height = "Height is required.";
-    if (!profile.photos || profile.photos.length < 1) errors.photos = "At least one photo is required.";
+    if (!profile.photos || profile.photos.length < 3) errors.photos = "At least three photos are required.";
 
     return {
         isValid: Object.keys(errors).length === 0,

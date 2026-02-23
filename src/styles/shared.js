@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import COLORS from '../constants/colors';
+import SPACING from '../constants/spacing';
 
 const sharedStyles = StyleSheet.create({
     container: {
@@ -12,36 +13,37 @@ const sharedStyles = StyleSheet.create({
     },
     scrollContent: {
         flexGrow: 1,
-        paddingHorizontal: 32,
+        paddingHorizontal: SPACING.xl,
     },
     header: {
-        paddingTop: 20,
-        marginBottom: 24,
+        paddingTop: SPACING.lg, // 24px per Task 3 (Top -> StepIndicator top)
+        paddingHorizontal: SPACING.xl, // 32px per Task 2
+        marginBottom: 0, // Will be handled by row spacing
         alignItems: 'center',
     },
     content: {
-        paddingTop: 32,
+        paddingTop: 0, // Gaps handled by margins
     },
     title: {
         fontFamily: 'PlayfairDisplay_700Bold',
         fontSize: 32,
         color: COLORS.text,
-        marginBottom: 32,
+        marginBottom: SPACING.sm, // 8px per Task 3 (Title -> Subtitle)
         letterSpacing: -0.8,
         lineHeight: 42,
     },
     bodyText: {
         fontFamily: 'Inter_400Regular',
         fontSize: 16,
-        color: '#6B7280',
+        color: COLORS.gray, // m-4: was '#6B7280' (Tailwind), now design system token
         lineHeight: 24,
-        marginBottom: 32,
+        marginBottom: SPACING.lg, // 24px per Task 3 (Body -> First option)
     },
     footer: {
-        paddingHorizontal: 32,
-        paddingBottom: 48,
+        paddingHorizontal: SPACING.xl, // 32px per Task 2
+        paddingBottom: SPACING.xxl, // 48px per Task 2
         flexDirection: 'row',
-        alignItems: 'flex-end',
+        alignItems: 'center', // Changed from flex-end for better alignment with toggle
         justifyContent: 'space-between',
     },
     pillButton: {
@@ -51,7 +53,7 @@ const sharedStyles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 10,
+        gap: SPACING.sm, // Fixed from 10 to 8
         shadowColor: COLORS.black,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.06,
@@ -65,7 +67,7 @@ const sharedStyles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 10,
+        gap: SPACING.sm, // Fixed from 10 to 8
         shadowColor: COLORS.black,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.06,
@@ -90,17 +92,17 @@ const sharedStyles = StyleSheet.create({
         elevation: 3,
     },
     visibilityToggleRowStandalone: {
-        marginTop: 10,
-        marginBottom: 20,
+        marginTop: SPACING.sm, // Fixed from 10 to 8
+        marginBottom: SPACING.md, // Fixed from 20 to 16
     },
     intentionList: {
-        marginTop: 10,
+        marginTop: SPACING.sm, // Fixed from 10 to 8
     },
     intentionOption: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 18,
+        paddingVertical: 20, // Will be overridden by OptionRow defaults
         borderBottomWidth: 1,
         borderBottomColor: '#F3F4F6',
     },
@@ -113,11 +115,10 @@ const sharedStyles = StyleSheet.create({
     underlinedInputContainer: {
         borderBottomWidth: 2,
         borderBottomColor: COLORS.black,
-        marginBottom: 24,
+        marginBottom: SPACING.lg, // 24px
     },
     stepIndicatorArea: {
-        paddingHorizontal: 0,
-        marginBottom: 8,
+        marginBottom: SPACING.xl, // 32px per Task 3 (Indicator -> Title)
     },
     chapterLabel: {
         fontFamily: 'Inter_600SemiBold',
@@ -125,11 +126,11 @@ const sharedStyles = StyleSheet.create({
         color: '#9CA3AF',
         letterSpacing: 1.5,
         textTransform: 'uppercase',
-        marginBottom: 12,
+        marginBottom: 0, // Reset to 0 as it's in a row now
     },
     progressRow: {
-        marginTop: 4,
-        marginBottom: 12,
+        marginTop: SPACING.xs, // 4px
+        marginBottom: SPACING.sm, // 8px
     },
     progressTrack: {
         height: 2,
@@ -147,9 +148,10 @@ const sharedStyles = StyleSheet.create({
         fontSize: 13,
         color: '#9CA3AF',
         flex: 1,
-        paddingRight: 16,
+        paddingRight: SPACING.md, // 16px
         lineHeight: 18,
     },
 });
 
 export default sharedStyles;
+

@@ -7,8 +7,10 @@ import BackButton from '../components/BackButton';
 import FAB from '../components/FAB';
 import OptionRow from '../components/OptionRow';
 import VisibilityToggle from '../components/VisibilityToggle';
+import VisibilityInfoSheet from '../components/VisibilityInfoSheet';
 import PremiumScreenWrapper from '../components/PremiumScreenWrapper';
 import COLORS from '../constants/colors';
+import SPACING from '../constants/spacing';
 import { STEP_ORDER } from '../constants/steps';
 import sharedStyles from '../styles/shared';
 
@@ -17,6 +19,7 @@ const DatingIntentionScreen = ({ onNext, onBack }) => {
     const [selectedIntention, setSelectedIntention] = useState(null);
     const [customText, setCustomText] = useState('');
     const [isVisible, setIsVisible] = useState(true);
+    const [infoSheetOpen, setInfoSheetOpen] = useState(false);
 
     const currentIndex = STEP_ORDER.indexOf('datingIntention');
     const totalSteps = STEP_ORDER.length;
@@ -39,8 +42,7 @@ const DatingIntentionScreen = ({ onNext, onBack }) => {
 
     return (
         <View style={sharedStyles.screenContainer}>
-            <View style={sharedStyles.header}><BackButton onPress={onBack} /></View>
-            <StepIndicator currentIndex={currentIndex} totalSteps={totalSteps} />
+            <StepIndicator currentIndex={currentIndex} totalSteps={totalSteps} onBack={onBack} />
             <ScrollView contentContainerStyle={sharedStyles.scrollContent} showsVerticalScrollIndicator={false}>
                 <PremiumScreenWrapper>
                     <View style={sharedStyles.content}>
@@ -54,9 +56,22 @@ const DatingIntentionScreen = ({ onNext, onBack }) => {
                             <TextInput style={styles.dashedTextArea} placeholder="Share more about what you're looking for in your own words" placeholderTextColor={COLORS.gray} multiline numberOfLines={3} value={customText} onChangeText={setCustomText} selectionColor={COLORS.black} />
                             <View style={[styles.addIconCircle, { backgroundColor: COLORS.black }]}><MaterialIcons name="add" size={20} color={COLORS.white} /></View>
                         </View>
-                    </View>
-                    <View style={[styles.visibilityTopBorderRow, { borderTopWidth: 0 }]}>
-                        <VisibilityToggle isVisible={isVisible} onToggle={() => setIsVisible(!isVisible)} activeColor={COLORS.black} style={{ flex: 1, marginTop: 48 }} />
+                        {/* M-7: Moved visibilityToggleRowStandalone inside content View */}
+                        <View style={sharedStyles.visibilityToggleRowStandalone}>
+                            <VisibilityToggle
+                                isVisible={isVisible}
+                                onToggle={() => setIsVisible(!isVisible)}
+                                onInfoPress={() => setInfoSheetOpen(true)}
+                                activeColor={COLORS.black}
+                            />
+                        </View>
+                        {infoSheetOpen && (
+                            <VisibilityInfoSheet
+                                fieldName="datingIntention"
+                                isVisible={isVisible}
+                                onClose={() => setInfoSheetOpen(false)}
+                            />
+                        )}
                     </View>
                 </PremiumScreenWrapper>
             </ScrollView>
@@ -74,13 +89,13 @@ const styles = StyleSheet.create({
         borderColor: '#E5E7EB',
         borderStyle: 'dashed',
         borderRadius: 12,
-        padding: 16,
+        padding: SPACING.md,
         flexDirection: 'row',
         alignItems: 'flex-start',
-        gap: 12,
+        gap: SPACING.md,
         backgroundColor: 'rgba(255,255,255,0.4)',
-        marginTop: 24,
-        marginBottom: 32,
+        marginTop: SPACING.lg,
+        marginBottom: SPACING.xl,
     },
     dashedTextArea: {
         flex: 1,
@@ -98,7 +113,7 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.black,
         justifyContent: 'center',
         alignItems: 'center',
-        marginLeft: 12,
+        marginLeft: SPACING.md, // m-9: was 12 (off-grid), now SPACING.md = 16
     },
     visibilityTopBorderRow: {
         flexDirection: 'row',

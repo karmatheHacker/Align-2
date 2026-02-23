@@ -25,7 +25,7 @@ const ChapterTransition = ({ chapterName }) => {
             isFirstRender.current = false;
             return;
         }
-        if (!chapterName) return;
+        if (!chapterName || chapterName.includes('Chapter 2')) return;
 
         // Capture the new name while animating
         setDisplayName(chapterName);

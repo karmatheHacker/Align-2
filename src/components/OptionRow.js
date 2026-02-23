@@ -4,6 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import PropTypes from 'prop-types';
 import COLORS from '../constants/colors';
+import SPACING from '../constants/spacing';
 
 const triggerLight = async () => {
     try { await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch (_) { }
@@ -117,7 +118,7 @@ const OptionRow = memo(({
               * Inner Animated.View: JS driver     — shadow/elevation only.
               * These two layers MUST remain separate. Never merge their styles.
               */}
-            <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+            <Animated.View style={{ transform: [{ scale: scaleAnim }], width: '100%' }}>
                 <Animated.View
                     style={[
                         styles.selectableOptionRow,
@@ -127,7 +128,7 @@ const OptionRow = memo(({
                         { shadowOpacity, elevation },
                     ]}
                 >
-                    <View style={{ flex: 1, paddingRight: 10 }}>
+                    <View style={{ flex: 1, paddingRight: SPACING.md }}>
                         <Text style={[styles.selectableOptionLabel, labelStyle, selected && { color: activeColor }]}>
                             {label}
                         </Text>
@@ -172,8 +173,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 20,
-        paddingHorizontal: 20,
+        paddingVertical: SPACING.lg, // 24px preferred
+        paddingHorizontal: SPACING.md, // 16px per Task 5
         minHeight: 64,
         borderColor: 'transparent',
         borderRadius: 16,
@@ -193,11 +194,11 @@ const styles = StyleSheet.create({
         fontFamily: 'Inter_400Regular',
         fontSize: 16,
         color: '#6B7280',
-        marginTop: 4,
+        marginTop: SPACING.xs, // 4px
         lineHeight: 22,
     },
     radioCircle: {
-        width: 44,
+        width: 24, // Fixed from 44 to 24
         height: 24,
         borderRadius: 12,
         borderWidth: 2,
@@ -212,7 +213,7 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.black,
     },
     customCheckbox: {
-        width: 44,
+        width: 24, // Fixed from 44 to 24
         height: 24,
         borderRadius: 6,
         borderWidth: 2,

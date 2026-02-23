@@ -9,7 +9,7 @@ describe('validateProfile', () => {
         sexuality: 'Straight',
         datingIntention: 'Long-term partner',
         height: { value: '180', unit: 'cm' },
-        photos: ['uri1'],
+        photos: ['uri1', 'uri2', 'uri3'],
     };
 
     it('validates a complete valid profile', () => {
@@ -71,15 +71,15 @@ describe('validateProfile', () => {
         expect(result.errors.birthday).toBe("Invalid date.");
     });
 
-    it('returns error if photos is empty', () => {
-        const profile = { ...validProfile, photos: [] };
+    it('returns error if photos length < 3', () => {
+        const profile = { ...validProfile, photos: ['uri1', 'uri2'] };
         const result = validateProfile(profile);
         expect(result.isValid).toBe(false);
         expect(result.errors.photos).toBeDefined();
     });
 
-    it('is valid if photos has 1 item', () => {
-        const profile = { ...validProfile, photos: ['uri1'] };
+    it('is valid if photos has 3 items', () => {
+        const profile = { ...validProfile, photos: ['uri1', 'uri2', 'uri3'] };
         const result = validateProfile(profile);
         expect(result.isValid).toBe(true);
     });

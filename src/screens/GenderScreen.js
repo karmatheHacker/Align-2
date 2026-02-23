@@ -6,8 +6,10 @@ import BackButton from '../components/BackButton';
 import FAB from '../components/FAB';
 import OptionRow from '../components/OptionRow';
 import VisibilityToggle from '../components/VisibilityToggle';
+import VisibilityInfoSheet from '../components/VisibilityInfoSheet';
 import PremiumScreenWrapper from '../components/PremiumScreenWrapper';
 import COLORS from '../constants/colors';
+import SPACING from '../constants/spacing';
 import { STEP_ORDER } from '../constants/steps';
 import sharedStyles from '../styles/shared';
 
@@ -15,6 +17,7 @@ const GenderScreen = ({ onNext, onBack }) => {
     const { dispatch } = useOnboarding();
     const [selectedGender, setSelectedGender] = useState(null);
     const [isVisible, setIsVisible] = useState(true);
+    const [infoSheetOpen, setInfoSheetOpen] = useState(false);
 
     const currentIndex = STEP_ORDER.indexOf('gender');
     const totalSteps = STEP_ORDER.length;
@@ -33,10 +36,7 @@ const GenderScreen = ({ onNext, onBack }) => {
 
     return (
         <View style={sharedStyles.screenContainer}>
-            <View style={sharedStyles.header}>
-                <BackButton onPress={onBack} />
-            </View>
-            <StepIndicator currentIndex={currentIndex} totalSteps={totalSteps} />
+            <StepIndicator currentIndex={currentIndex} totalSteps={totalSteps} onBack={onBack} />
             <ScrollView contentContainerStyle={sharedStyles.scrollContent} showsVerticalScrollIndicator={false}>
                 <PremiumScreenWrapper>
                     <View style={sharedStyles.content}>
@@ -60,12 +60,21 @@ const GenderScreen = ({ onNext, onBack }) => {
                                 />
                             ))}
                         </View>
-                        <VisibilityToggle
-                            isVisible={isVisible}
-                            onToggle={() => setIsVisible(!isVisible)}
-                            activeColor={COLORS.black}
-                            style={{ marginTop: 48 }}
-                        />
+                        <View style={sharedStyles.visibilityToggleRowStandalone}>
+                            <VisibilityToggle
+                                isVisible={isVisible}
+                                onToggle={() => setIsVisible(!isVisible)}
+                                onInfoPress={() => setInfoSheetOpen(true)}
+                                activeColor={COLORS.black}
+                            />
+                        </View>
+                        {infoSheetOpen && (
+                            <VisibilityInfoSheet
+                                fieldName="gender"
+                                isVisible={isVisible}
+                                onClose={() => setInfoSheetOpen(false)}
+                            />
+                        )}
                     </View>
                 </PremiumScreenWrapper>
             </ScrollView>
@@ -77,13 +86,13 @@ const GenderScreen = ({ onNext, onBack }) => {
                     hint="Select your gender to continue"
                 />
             </View>
-        </View>
+        </View >
     );
 };
 
 const styles = StyleSheet.create({
     genderList: {
-        marginTop: 10,
+        marginTop: SPACING.sm, // M-8: was 10 (off-grid), now SPACING.sm = 8
     },
 });
 

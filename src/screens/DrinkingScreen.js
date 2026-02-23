@@ -3,12 +3,13 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-nati
 import { MaterialIcons } from '@expo/vector-icons';
 import { useOnboarding } from '../context/OnboardingContext';
 import StepIndicator from '../components/StepIndicator';
-import BackButton from '../components/BackButton';
 import FAB from '../components/FAB';
 import OptionRow from '../components/OptionRow';
 import VisibilityToggle from '../components/VisibilityToggle';
+import VisibilityInfoSheet from '../components/VisibilityInfoSheet';
 import PremiumScreenWrapper from '../components/PremiumScreenWrapper';
 import COLORS from '../constants/colors';
+import SPACING from '../constants/spacing';
 import { STEP_ORDER } from '../constants/steps';
 import sharedStyles from '../styles/shared';
 
@@ -16,6 +17,8 @@ const DrinkingScreen = ({ onNext, onBack }) => {
     const { dispatch } = useOnboarding();
     const [selectedDrinking, setSelectedDrinking] = useState(null);
     const [isVisible, setIsVisible] = useState(true);
+    // M-3: Added missing infoSheet state
+    const [infoSheetOpen, setInfoSheetOpen] = useState(false);
 
     const currentIndex = STEP_ORDER.indexOf('drinking');
     const totalSteps = STEP_ORDER.length;
@@ -35,10 +38,7 @@ const DrinkingScreen = ({ onNext, onBack }) => {
 
     return (
         <View style={sharedStyles.screenContainer}>
-            <View style={sharedStyles.header}>
-                <BackButton onPress={onBack} />
-            </View>
-            <StepIndicator currentIndex={currentIndex} totalSteps={totalSteps} />
+            <StepIndicator currentIndex={currentIndex} totalSteps={totalSteps} onBack={onBack} />
 
             <ScrollView contentContainerStyle={sharedStyles.scrollContent} showsVerticalScrollIndicator={false}>
                 <PremiumScreenWrapper>
@@ -55,25 +55,33 @@ const DrinkingScreen = ({ onNext, onBack }) => {
                                     selected={selectedDrinking === option.id}
                                     onPress={() => setSelectedDrinking(option.id)}
                                     activeColor={COLORS.black}
-                                    style={[sharedStyles.intentionOption, { paddingVertical: 20 }]}
+                                    style={[sharedStyles.intentionOption, { paddingVertical: SPACING.lg }]}
                                 />
                             ))}
                         </View>
 
-                        <VisibilityToggle
-                            isVisible={isVisible}
-                            onToggle={() => setIsVisible(!isVisible)}
-                            activeColor={COLORS.black}
-                            style={[styles.visibilityToggleCard, { marginTop: 48 }]}
-                        />
+                        {/* M-1: Replaced card-style VisibilityToggle with standard wrapper */}
+                        <View style={sharedStyles.visibilityToggleRowStandalone}>
+                            <VisibilityToggle
+                                isVisible={isVisible}
+                                onToggle={() => setIsVisible(!isVisible)}
+                                onInfoPress={() => setInfoSheetOpen(true)}
+                                activeColor={COLORS.black}
+                            />
+                        </View>
+                        {/* M-3: Added VisibilityInfoSheet */}
+                        {infoSheetOpen && (
+                            <VisibilityInfoSheet
+                                fieldName="drinking"
+                                isVisible={isVisible}
+                                onClose={() => setInfoSheetOpen(false)}
+                            />
+                        )}
                     </View>
                 </PremiumScreenWrapper>
             </ScrollView>
 
-            <View style={[styles.p8, { alignItems: 'center' }]}>
-                <Text style={styles.brandingText}>{`Align © ${new Date().getFullYear()}`}</Text>
-            </View>
-
+            {/* C-4: Deleted branding block ("Align © {year}") */}
             <View style={sharedStyles.footer}>
                 <View style={{ flex: 1 }} />
                 <FAB onPress={handleNext} disabled={!selectedDrinking} hint="Select your status to continue" />
@@ -82,24 +90,8 @@ const DrinkingScreen = ({ onNext, onBack }) => {
     );
 };
 
-const styles = StyleSheet.create({
-    visibilityToggleCard: {
-        padding: 20,
-        backgroundColor: COLORS.white,
-        borderRadius: 16,
-        borderWidth: 1,
-        borderColor: '#F3F4F6',
-    },
-    p8: {
-        padding: 32,
-    },
-    brandingText: {
-        fontSize: 10,
-        fontFamily: 'Inter_700Bold',
-        color: '#D1D5DB',
-        letterSpacing: 2,
-        textAlign: 'center',
-    },
-});
+// C-4: Deleted dead styles visibilityToggleCard, p8, brandingText
+// m-1: Fixed </View > trailing space in JSX
+const styles = StyleSheet.create({});
 
 export default DrinkingScreen;

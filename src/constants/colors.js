@@ -11,6 +11,7 @@ const COLORS = {
     inactiveBorder: '#E5E7EB',
     overlay: 'rgba(0,0,0,0.5)',
     surface: '#F9FAFB',
+    error: '#ef4444', // m-5: tokenised error colour
 };
 
 export default COLORS;

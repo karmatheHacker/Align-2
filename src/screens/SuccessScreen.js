@@ -3,10 +3,12 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useOnboarding } from '../context/OnboardingContext';
 import COLORS from '../constants/colors';
+import SPACING from '../constants/spacing';
 import sharedStyles from '../styles/shared';
 import PremiumScreenWrapper from '../components/PremiumScreenWrapper';
 
-const SuccessScreen = () => {
+// C-8: Accept onComplete prop to wire actual navigation on success
+const SuccessScreen = ({ onComplete }) => {
     const { state } = useOnboarding();
     return (
         <View style={sharedStyles.screenContainer}>
@@ -23,7 +25,8 @@ const SuccessScreen = () => {
                     <TouchableOpacity
                         style={[sharedStyles.primaryButton, styles.successButton]}
                         activeOpacity={0.8}
-                        onPress={() => console.log('Final Redirect to App Root')}
+                        // C-8: Replace console.log with actual navigation via onComplete prop
+                        onPress={() => onComplete?.()}
                     >
                         <Text style={sharedStyles.pillButtonText}>Go to App</Text>
                     </TouchableOpacity>
@@ -38,21 +41,21 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         flex: 1,
-        paddingHorizontal: 40,
+        paddingHorizontal: SPACING.xxl,
     },
     successTitle: {
         textAlign: 'center',
-        marginTop: 32,
+        marginTop: SPACING.xl,
         fontSize: 32,
     },
     successBody: {
         textAlign: 'center',
         color: COLORS.gray,
-        marginTop: 12,
+        marginTop: SPACING.md,
         fontSize: 16,
     },
     successButton: {
-        marginTop: 48,
+        marginTop: SPACING.xxl,
         width: '100%',
     },
 });

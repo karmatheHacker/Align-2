@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Modal, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
+import SPACING from '../constants/spacing';
 import COLORS from '../constants/colors';
 import { calculateAge, getBirthDateString } from '../utils/dateHelpers';
 
@@ -44,7 +45,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
-        paddingHorizontal: 30,
+        paddingHorizontal: SPACING.xl,
     },
     modalContainer: {
         width: '100%',
@@ -53,20 +54,20 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
     modalContent: {
-        padding: 32,
+        padding: SPACING.xl,
         alignItems: 'center',
     },
     modalTitle: {
         fontFamily: 'PlayfairDisplay_700Bold',
         fontSize: 32,
         color: COLORS.text,
-        marginBottom: 8,
+        marginBottom: SPACING.sm,
     },
     modalBirthDate: {
         fontFamily: 'Inter_600SemiBold',
         fontSize: 16,
         color: COLORS.gray,
-        marginBottom: 24,
+        marginBottom: SPACING.lg,
     },
     modalBody: {
         fontFamily: 'Inter_400Regular',

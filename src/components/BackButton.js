@@ -18,7 +18,11 @@ const BackButton = ({ onPress }) => (
 
 const styles = StyleSheet.create({
     backButton: {
-        padding: 5,
+        width: 44,
+        height: 44,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: -10, // Offset for alignment with text if needed
     },
 });
 

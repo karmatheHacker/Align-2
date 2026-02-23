@@ -27,6 +27,8 @@ import TobaccoScreen from './screens/TobaccoScreen';
 import DrinkingScreen from './screens/DrinkingScreen';
 import LocationScreen from './screens/LocationScreen';
 import PhotosScreen from './screens/PhotosScreen';
+import BioScreen from './screens/BioScreen';
+import VerificationScreen from './screens/VerificationScreen';
 import NotificationsScreen from './screens/NotificationsScreen';
 import SuccessScreen from './screens/SuccessScreen';
 import ReviewScreen from './screens/ReviewScreen';
@@ -41,7 +43,7 @@ import { STEP_ORDER } from './constants/steps';
 const CHAPTER_NAMES = [
     { upToIndex: 5, label: 'Chapter 1: About You' },
     { upToIndex: 15, label: 'Chapter 2: Your Life' },
-    { upToIndex: 17, label: 'Chapter 3: Your Photos' },
+    { upToIndex: 19, label: 'Chapter 3: Your Photos' },
 ];
 
 const getChapterLabel = (idx) => {
@@ -126,10 +128,14 @@ const OnboardingFlow = () => {
                     <LocationScreen key="location" onNext={goNext} onBack={goBack} />
                 ) : step === 'photos' ? (
                     <PhotosScreen key="photos" onNext={goNext} onBack={goBack} />
+                ) : step === 'bio' ? (
+                    <BioScreen key="bio" onNext={goNext} onBack={goBack} />
+                ) : step === 'verification' ? (
+                    <VerificationScreen key="verification" onNext={goNext} onBack={goBack} />
                 ) : step === 'notifications' ? (
                     <NotificationsScreen key="notifications" onNext={goNext} onBack={goBack} />
                 ) : step === 'success' ? (
-                    <SuccessScreen key="success" />
+                    <SuccessScreen key="success" onComplete={() => setStepIndex(0)} />
                 ) : (
                     <ReviewScreen key="review" onBack={goBack} onSuccess={() => setStep('success')} />
                 )}

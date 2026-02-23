@@ -1,18 +1,23 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TextInput } from 'react-native';
+import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useOnboarding } from '../context/OnboardingContext';
 import StepIndicator from '../components/StepIndicator';
 import FAB from '../components/FAB';
 import COLORS from '../constants/colors';
+import SPACING from '../constants/spacing';
 import { STEP_ORDER } from '../constants/steps';
 import sharedStyles from '../styles/shared';
 import PremiumScreenWrapper from '../components/PremiumScreenWrapper';
+import WhySheet from '../components/WhySheet';
+
+// m-2: Merged duplicate TouchableOpacity imports into single import line above
 
 const NameScreen = ({ onNext }) => {
     const { dispatch } = useOnboarding();
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
+    const [whySheetOpen, setWhySheetOpen] = useState(false);
 
     const currentIndex = STEP_ORDER.indexOf('name');
     const totalSteps = STEP_ORDER.length;
@@ -25,11 +30,11 @@ const NameScreen = ({ onNext }) => {
 
     return (
         <View style={sharedStyles.screenContainer}>
+            <StepIndicator
+                currentIndex={currentIndex}
+                totalSteps={totalSteps}
+            />
             <ScrollView contentContainerStyle={sharedStyles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-                <View style={sharedStyles.header}>
-                    <Text style={styles.disclaimer}>NO BACKGROUND CHECKS ARE CONDUCTED</Text>
-                </View>
-                <StepIndicator currentIndex={currentIndex} totalSteps={totalSteps} />
                 <PremiumScreenWrapper animateEntrance>
                     <View style={sharedStyles.content}>
                         <Text style={sharedStyles.title}>Let's begin with your name</Text>
@@ -43,18 +48,45 @@ const NameScreen = ({ onNext }) => {
                             <View style={styles.helperTextContainer}>
                                 <Text style={styles.helperText}>
                                     Last name is optional, and only shared with matches.{' '}
-                                    <Text style={styles.linkText} onPress={() => { }}>Why?</Text>
+                                    <Text
+                                        style={styles.whyLink}
+                                        onPress={() => setWhySheetOpen(true)}
+                                    >
+                                        Why?
+                                    </Text>
                                 </Text>
-                            </View>
-                            <View style={styles.visibilityContainer}>
-                                <Feather name="eye" size={20} color={COLORS.gray} />
-                                <Text style={styles.visibilityText} accessibilityLabel="Your name is always visible on your profile">Always visible on profile</Text>
                             </View>
                         </View>
                     </View>
                 </PremiumScreenWrapper>
             </ScrollView>
+
+            <WhySheet
+                visible={whySheetOpen}
+                onClose={() => setWhySheetOpen(false)}
+                icon="lock"
+                headline="Your last name, your rules"
+                cards={[
+                    {
+                        icon: "eye",
+                        headline: "Only matches see it",
+                        body: "Your last name is hidden from public profiles. Revealed only when you both match."
+                    },
+                    {
+                        icon: "settings",
+                        headline: "You control it",
+                        body: "Change or remove your last name anytime from your profile settings."
+                    },
+                    {
+                        icon: "shield",
+                        headline: "We never sell your data",
+                        body: "Align doesn't share your personal info with third parties. Ever."
+                    }
+                ]}
+            />
+            {/* C-6: Fixed FAB right-alignment — added flex: 1 left spacer */}
             <View style={sharedStyles.footer}>
+                <View style={{ flex: 1 }} />
                 <FAB
                     onPress={handleNext}
                     disabled={!firstName.trim()}
@@ -65,20 +97,13 @@ const NameScreen = ({ onNext }) => {
     );
 };
 
-const styles = {
-    disclaimer: {
-        fontFamily: 'Inter_600SemiBold',
-        fontSize: 11,
-        color: '#9CA3AF',
-        letterSpacing: 1.5,
-        textAlign: 'center',
-        textTransform: 'uppercase',
-    },
+// m-3: Converted plain object to StyleSheet.create()
+const styles = StyleSheet.create({
     form: {
         flex: 1,
     },
     inputContainer: {
-        marginBottom: 35,
+        marginBottom: SPACING.xl,
         borderBottomWidth: 2,
         borderBottomColor: COLORS.black,
     },
@@ -91,7 +116,7 @@ const styles = {
     },
     helperTextContainer: {
         marginTop: 0,
-        marginBottom: 45,
+        marginBottom: SPACING.xxl,
     },
     helperText: {
         fontFamily: 'Inter_400Regular',
@@ -99,20 +124,23 @@ const styles = {
         color: COLORS.text,
         lineHeight: 22,
     },
-    linkText: {
-        color: '#4C1D95',
+    whyLink: {
         fontFamily: 'Inter_600SemiBold',
+        fontSize: 15,
+        color: COLORS.richPurple,
+        textDecorationLine: 'underline',
     },
     visibilityContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 10,
+        justifyContent: 'space-between',
+        marginTop: SPACING.lg,
     },
     visibilityText: {
         fontFamily: 'Inter_500Medium',
         fontSize: 15,
         color: COLORS.text,
     },
-};
+});
 
 export default NameScreen;

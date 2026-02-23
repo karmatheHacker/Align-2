@@ -6,6 +6,7 @@ import StepIndicator from '../components/StepIndicator';
 import BackButton from '../components/BackButton';
 import FAB from '../components/FAB';
 import COLORS from '../constants/colors';
+import SPACING from '../constants/spacing';
 import { STEP_ORDER } from '../constants/steps';
 import sharedStyles from '../styles/shared';
 import PremiumScreenWrapper from '../components/PremiumScreenWrapper';
@@ -26,15 +27,12 @@ const LocationScreen = ({ onNext, onBack }) => {
 
     return (
         <View style={sharedStyles.screenContainer}>
+            <StepIndicator currentIndex={currentIndex} totalSteps={totalSteps} onBack={onBack} />
             <ScrollView
                 contentContainerStyle={sharedStyles.scrollContent}
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
             >
-                <View style={sharedStyles.header}>
-                    <BackButton onPress={onBack} />
-                </View>
-                <StepIndicator currentIndex={currentIndex} totalSteps={totalSteps} />
 
                 <PremiumScreenWrapper animateEntrance>
                     <View style={sharedStyles.content}>
@@ -112,7 +110,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 240,
         borderRadius: 24,
-        marginBottom: 32,
+        marginBottom: SPACING.xl,
         position: 'relative',
         backgroundColor: '#E5E7EB',
     },
@@ -197,7 +195,7 @@ const styles = StyleSheet.create({
     privacyFooter: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingRight: 20,
+        paddingRight: SPACING.md, // m-8: was 20 (off-grid), SPACING.md = 16
         flex: 1,
     },
     privacyFooterText: {

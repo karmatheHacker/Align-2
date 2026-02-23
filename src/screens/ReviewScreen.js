@@ -1,9 +1,12 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
 import { useOnboarding } from '../context/OnboardingContext';
-import BackButton from '../components/BackButton';
+import StepIndicator from '../components/StepIndicator';
+import FAB from '../components/FAB';
 import PremiumScreenWrapper from '../components/PremiumScreenWrapper';
 import COLORS from '../constants/colors';
+import SPACING from '../constants/spacing';
+import { STEP_ORDER } from '../constants/steps';
 import sharedStyles from '../styles/shared';
 import validateProfile from '../utils/validateProfile';
 import submitProfile from '../utils/submitProfile';
@@ -68,21 +71,25 @@ const ReviewScreen = ({ onBack, onSuccess }) => {
 
     return (
         <View style={sharedStyles.screenContainer}>
+            {/* C-3: Replace manual BackButton + header with StepIndicator */}
+            <StepIndicator
+                currentIndex={STEP_ORDER.length}
+                totalSteps={STEP_ORDER.length}
+                onBack={onBack}
+            />
             {submitError && (
                 <View style={styles.errorBanner}>
                     <Text style={styles.errorBannerText}>{submitError}</Text>
-                    <TouchableOpacity onPress={handleSubmit} style={styles.retryButton}>
-                        <Text style={styles.retryButtonText}>Try again</Text>
-                    </TouchableOpacity>
+                    <View style={styles.retryButton}>
+                        <Text style={styles.retryButtonText} onPress={handleSubmit}>Try again</Text>
+                    </View>
                 </View>
             )}
-            <View style={sharedStyles.header}>
-                <BackButton onPress={onBack} />
-            </View>
+            {/* C-2: Submit button moved out of ScrollView into pinned footer */}
             <ScrollView ref={scrollRef} contentContainerStyle={sharedStyles.scrollContent} showsVerticalScrollIndicator={false}>
                 <PremiumScreenWrapper animateEntrance>
                     <View style={sharedStyles.content}>
-                        <Text style={[sharedStyles.title, { marginBottom: 32 }]}>Review your profile</Text>
+                        <Text style={[sharedStyles.title, { marginBottom: SPACING.xl }]}>Review your profile</Text>
                         {renderSection('firstName', 'First Name', state.firstName)}
                         {renderSection('lastName', 'Last Name', state.lastName)}
                         {renderSection('birthday', 'Birthday', state.birthday)}
@@ -99,33 +106,34 @@ const ReviewScreen = ({ onBack, onSuccess }) => {
                         {renderSection('children', 'Children', state.children)}
                         {renderSection('tobacco', 'Tobacco', state.tobacco)}
                         {renderSection('drinking', 'Drinking', state.drinking)}
+                        {renderSection('publicBio', 'Public Bio', state.publicBio)}
+                        {renderSection('aiBio', 'AI Matchmaker Bio', state.aiBio)}
                         {renderSection('photos', 'Photos', state.photos)}
-
-                        <TouchableOpacity
-                            style={[sharedStyles.pillButton, styles.submitButton, submitting && { opacity: 0.7 }]}
-                            activeOpacity={0.8}
-                            onPress={handleSubmit}
-                            disabled={submitting}
-                        >
-                            {submitting ? (
-                                <ActivityIndicator color={COLORS.white} />
-                            ) : (
-                                <Text style={sharedStyles.pillButtonText}>SUBMIT PROFILE</Text>
-                            )}
-                        </TouchableOpacity>
                     </View>
                 </PremiumScreenWrapper>
             </ScrollView>
+            {/* C-2: Pinned footer with FAB */}
+            <View style={sharedStyles.footer}>
+                <View style={{ flex: 1 }} />
+                <FAB
+                    onPress={handleSubmit}
+                    disabled={submitting}
+                    hint="Fix errors above to submit"
+                    accessibilityLabel={submitting ? 'Submitting profile…' : 'Submit profile'}
+                >
+                    {submitting && <ActivityIndicator color={COLORS.white} />}
+                </FAB>
+            </View>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     reviewItem: {
-        marginBottom: 24,
+        marginBottom: SPACING.lg,
         borderBottomWidth: 1,
         borderBottomColor: '#F3F4F6',
-        paddingBottom: 16,
+        paddingBottom: SPACING.md,
     },
     reviewLabel: {
         fontFamily: 'Inter_500Medium',
@@ -133,7 +141,7 @@ const styles = StyleSheet.create({
         color: COLORS.gray,
         textTransform: 'uppercase',
         letterSpacing: 1,
-        marginBottom: 8,
+        marginBottom: SPACING.sm,
     },
     reviewValue: {
         fontFamily: 'Inter_600SemiBold',
@@ -141,19 +149,19 @@ const styles = StyleSheet.create({
         color: COLORS.text,
     },
     errorText: {
-        color: '#ef4444',
+        color: COLORS.error, // m-5: was '#ef4444', now tokenised
         fontSize: 12,
-        marginTop: 4,
+        marginTop: SPACING.xs,
         fontFamily: 'Inter_500Medium',
     },
     errorBanner: {
         backgroundColor: '#FEE2E2',
-        padding: 16,
+        padding: SPACING.md,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginTop: 10,
-        marginHorizontal: 20,
+        marginTop: SPACING.sm,
+        marginHorizontal: SPACING.lg,
         borderRadius: 12,
     },
     errorBannerText: {
@@ -163,7 +171,7 @@ const styles = StyleSheet.create({
         fontSize: 13,
     },
     retryButton: {
-        marginLeft: 16,
+        marginLeft: SPACING.md,
         backgroundColor: '#991B1B',
         paddingHorizontal: 12,
         paddingVertical: 6,
@@ -173,10 +181,6 @@ const styles = StyleSheet.create({
         color: COLORS.white,
         fontSize: 12,
         fontFamily: 'Inter_600SemiBold',
-    },
-    submitButton: {
-        marginTop: 40,
-        backgroundColor: COLORS.black,
     },
 });
 

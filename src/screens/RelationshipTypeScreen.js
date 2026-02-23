@@ -3,12 +3,13 @@ import { View, Text, ScrollView, TextInput, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useOnboarding } from '../context/OnboardingContext';
 import StepIndicator from '../components/StepIndicator';
-import BackButton from '../components/BackButton';
 import FAB from '../components/FAB';
 import OptionRow from '../components/OptionRow';
 import VisibilityToggle from '../components/VisibilityToggle';
+import VisibilityInfoSheet from '../components/VisibilityInfoSheet';
 import PremiumScreenWrapper from '../components/PremiumScreenWrapper';
 import COLORS from '../constants/colors';
+import SPACING from '../constants/spacing';
 import { STEP_ORDER } from '../constants/steps';
 import sharedStyles from '../styles/shared';
 
@@ -17,6 +18,8 @@ const RelationshipTypeScreen = ({ onNext, onBack }) => {
     const [selectedType, setSelectedType] = useState(null);
     const [customText, setCustomText] = useState('');
     const [isVisible, setIsVisible] = useState(true);
+    // M-4: Added missing infoSheet state
+    const [infoSheetOpen, setInfoSheetOpen] = useState(false);
 
     const currentIndex = STEP_ORDER.indexOf('relationshipType');
     const totalSteps = STEP_ORDER.length;
@@ -35,10 +38,7 @@ const RelationshipTypeScreen = ({ onNext, onBack }) => {
 
     return (
         <View style={sharedStyles.screenContainer}>
-            <View style={sharedStyles.header}>
-                <BackButton onPress={onBack} />
-            </View>
-            <StepIndicator currentIndex={currentIndex} totalSteps={totalSteps} />
+            <StepIndicator currentIndex={currentIndex} totalSteps={totalSteps} onBack={onBack} />
             <ScrollView contentContainerStyle={sharedStyles.scrollContent} showsVerticalScrollIndicator={false}>
                 <PremiumScreenWrapper>
                     <View style={sharedStyles.content}>
@@ -75,16 +75,27 @@ const RelationshipTypeScreen = ({ onNext, onBack }) => {
                                 <MaterialIcons name="add" size={20} color={COLORS.white} />
                             </View>
                         </View>
+                        {/* M-4: Added onInfoPress and VisibilityInfoSheet */}
+                        <View style={sharedStyles.visibilityToggleRowStandalone}>
+                            <VisibilityToggle
+                                isVisible={isVisible}
+                                onToggle={() => setIsVisible(!isVisible)}
+                                onInfoPress={() => setInfoSheetOpen(true)}
+                                activeColor={COLORS.black}
+                            />
+                        </View>
+                        {infoSheetOpen && (
+                            <VisibilityInfoSheet
+                                fieldName="relationshipType"
+                                isVisible={isVisible}
+                                onClose={() => setInfoSheetOpen(false)}
+                            />
+                        )}
                     </View>
                 </PremiumScreenWrapper>
             </ScrollView>
             <View style={sharedStyles.footer}>
-                <VisibilityToggle
-                    isVisible={isVisible}
-                    onToggle={() => setIsVisible(!isVisible)}
-                    activeColor={COLORS.black}
-                    style={{ flex: 1, paddingRight: 20 }}
-                />
+                <View style={{ flex: 1 }} />
                 <FAB
                     onPress={handleNext}
                     disabled={!selectedType}
@@ -102,9 +113,9 @@ const styles = StyleSheet.create({
     relationshipRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 20,
-        paddingHorizontal: 16,
-        marginHorizontal: -16,
+        paddingVertical: SPACING.lg,
+        paddingHorizontal: SPACING.md,
+        marginHorizontal: -SPACING.md,
         borderBottomWidth: 1,
         borderBottomColor: '#F3F4F6',
         borderRadius: 16,
@@ -118,8 +129,8 @@ const styles = StyleSheet.create({
         fontFamily: 'Inter_600SemiBold',
     },
     customInputContainer: {
-        marginTop: 32,
-        padding: 20,
+        marginTop: SPACING.xl,
+        padding: SPACING.md,
         borderRadius: 20,
         borderWidth: 2,
         borderColor: COLORS.inactiveBorder,
@@ -144,7 +155,7 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.black,
         justifyContent: 'center',
         alignItems: 'center',
-        marginLeft: 12,
+        marginLeft: SPACING.md,
     },
 });
 

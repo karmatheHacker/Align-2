@@ -1,26 +1,35 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, ScrollView, Animated, Easing, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
-import { Feather } from '@expo/vector-icons';
+import { Feather, MaterialIcons } from '@expo/vector-icons';
 import COLORS from '../constants/colors';
-import { STEP_ORDER, STEP_CONFIG } from '../constants/steps';
+import { STEP_ORDER } from '../constants/steps';
+import { STEP_ICONS } from '../constants/stepIcons';
 import sharedStyles from '../styles/shared';
+import BackButton from './BackButton';
+import SPACING from '../constants/spacing';
+import { Dimensions } from 'react-native';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 /**
- * StepIndicatorItem
- * Renders one icon circle in the step scroll row.
- *
- * States:
- *   isActive    — scales to 1.4, shows ripple ring loop, opacity 1
- *   isCompleted — opacity 1, shows a Feather "check" in place of the icon
- *   inactive    — opacity 0.25, no animation
+ * AnimatedStepNode
+ * Renders one step indicator node (future, active, or completed).
  */
-const StepIndicatorItem = ({ step, isActive, isCompleted }) => {
-    // Active scale: 1.0 → 1.4 when becoming active
-    const scaleAnim = useRef(new Animated.Value(1)).current;
-    const opacityAnim = useRef(new Animated.Value(isCompleted ? 1 : (isActive ? 1 : 0.25))).current;
+const AnimatedStepNode = ({ stepKey, status, onLayout }) => {
+    const prevStatus = useRef(status);
 
-    // Ripple ring
+    // Animated values for layout
+    const pillWidth = useRef(new Animated.Value(status === 'active' ? 44 : (status === 'completed' ? 28 : 8))).current;
+    const pillHeight = useRef(new Animated.Value(status === 'active' ? 44 : (status === 'completed' ? 28 : 8))).current;
+    const borderRadius = useRef(new Animated.Value(status === 'active' ? 22 : (status === 'completed' ? 14 : 4))).current;
+
+    // Animated values for visual state
+    const bgScale = useRef(new Animated.Value(status === 'future' ? 0 : 1)).current; // 0: lightGray, 1: black
+    const iconOpacity = useRef(new Animated.Value(status === 'active' ? 1 : 0)).current;
+    const checkOpacity = useRef(new Animated.Value(status === 'completed' ? 1 : 0)).current;
+
+    // Ripple ring loop for active state
     const rippleScale = useRef(new Animated.Value(1)).current;
     const rippleOpacity = useRef(new Animated.Value(0)).current;
     const rippleRef = useRef(null);
@@ -48,94 +57,136 @@ const StepIndicatorItem = ({ step, isActive, isCompleted }) => {
     };
 
     const stopRipple = () => {
-        if (rippleRef.current) {
-            rippleRef.current.stop();
-            rippleRef.current = null;
-        }
+        if (rippleRef.current) rippleRef.current.stop();
         rippleScale.setValue(1);
         rippleOpacity.setValue(0);
     };
 
     useEffect(() => {
-        if (isActive) {
-            // Scale up to 1.4
-            Animated.spring(scaleAnim, {
-                toValue: 1.4,
-                useNativeDriver: true,
-                speed: 20,
-                bounciness: 4,
-            }).start();
-            Animated.timing(opacityAnim, {
-                toValue: 1,
-                duration: 200,
-                useNativeDriver: true,
-            }).start();
-            startRipple();
-        } else {
-            stopRipple();
-            // Scale back down
-            Animated.spring(scaleAnim, {
-                toValue: 1,
-                useNativeDriver: true,
-                speed: 20,
-                bounciness: 0,
-            }).start();
-            Animated.timing(opacityAnim, {
-                toValue: isCompleted ? 1 : 0.25,
-                duration: 200,
-                useNativeDriver: true,
-            }).start();
-        }
+        if (status === 'active') startRipple();
+        else stopRipple();
         return () => stopRipple();
-    }, [isActive, isCompleted]);
+    }, [status]);
+
+    useEffect(() => {
+        if (prevStatus.current === status) return;
+
+        const config = {
+            active: { w: 44, h: 44, r: 22 },
+            completed: { w: 28, h: 28, r: 14 },
+            future: { w: 8, h: 8, r: 4 }
+        };
+
+        const target = config[status];
+
+        // Transition Logic
+        if (prevStatus.current === 'active' && status === 'completed') {
+            // Forward: Active -> Completed
+            Animated.sequence([
+                Animated.timing(iconOpacity, { toValue: 0, duration: 150, useNativeDriver: true }),
+                Animated.parallel([
+                    Animated.spring(pillWidth, { toValue: target.w, tension: 100, friction: 10, useNativeDriver: false }),
+                    Animated.spring(pillHeight, { toValue: target.h, tension: 100, friction: 10, useNativeDriver: false }),
+                    Animated.spring(borderRadius, { toValue: target.r, tension: 100, friction: 10, useNativeDriver: false }),
+                ]),
+                Animated.timing(checkOpacity, { toValue: 1, duration: 100, useNativeDriver: true })
+            ]).start();
+        } else if (prevStatus.current === 'future' && status === 'active') {
+            // Forward: Future -> Active
+            Animated.sequence([
+                Animated.delay(350),
+                Animated.parallel([
+                    Animated.spring(pillWidth, { toValue: target.w, tension: 120, friction: 8, useNativeDriver: false }),
+                    Animated.spring(pillHeight, { toValue: target.h, tension: 120, friction: 8, useNativeDriver: false }),
+                    Animated.spring(borderRadius, { toValue: target.r, tension: 120, friction: 8, useNativeDriver: false }),
+                    Animated.timing(bgScale, { toValue: 1, duration: 250, useNativeDriver: true }),
+                ]),
+                Animated.timing(iconOpacity, { toValue: 1, duration: 150, useNativeDriver: true })
+            ]).start();
+        } else if (prevStatus.current === 'active' && status === 'future') {
+            // Backward: Active -> Future
+            Animated.sequence([
+                Animated.timing(iconOpacity, { toValue: 0, duration: 100, useNativeDriver: true }),
+                Animated.parallel([
+                    Animated.spring(pillWidth, { toValue: target.w, tension: 120, friction: 8, useNativeDriver: false }),
+                    Animated.spring(pillHeight, { toValue: target.h, tension: 120, friction: 8, useNativeDriver: false }),
+                    Animated.spring(borderRadius, { toValue: target.r, tension: 120, friction: 8, useNativeDriver: false }),
+                    Animated.timing(bgScale, { toValue: 0, duration: 200, useNativeDriver: true }),
+                ])
+            ]).start();
+        } else if (prevStatus.current === 'completed' && status === 'active') {
+            // Backward: Completed -> Active
+            Animated.sequence([
+                Animated.delay(300),
+                Animated.parallel([
+                    Animated.spring(pillWidth, { toValue: target.w, tension: 100, friction: 10, useNativeDriver: false }),
+                    Animated.spring(pillHeight, { toValue: target.h, tension: 100, friction: 10, useNativeDriver: false }),
+                    Animated.spring(borderRadius, { toValue: target.r, tension: 100, friction: 10, useNativeDriver: false }),
+                ]),
+                Animated.parallel([
+                    Animated.timing(checkOpacity, { toValue: 0, duration: 150, useNativeDriver: true }),
+                    Animated.timing(iconOpacity, { toValue: 1, duration: 150, useNativeDriver: true })
+                ])
+            ]).start();
+        }
+
+        prevStatus.current = status;
+    }, [status]);
+
+    const iconData = STEP_ICONS[stepKey];
+    const IconComponent = iconData?.lib === 'MaterialIcons' ? MaterialIcons : Feather;
 
     return (
-        <View style={styles.itemWrapper}>
-            {/* Ripple ring — behind the icon circle */}
-            <Animated.View
-                style={[
-                    styles.rippleRing,
-                    {
-                        transform: [{ scale: rippleScale }],
-                        opacity: rippleOpacity,
-                    },
-                ]}
-                pointerEvents="none"
-            />
-
-            {/* Icon circle */}
-            <Animated.View
-                accessible={false}
-                style={[
-                    styles.iconCircle,
-                    isActive && styles.iconCircleActive,
-                    isCompleted && !isActive && styles.iconCircleCompleted,
-                    {
-                        opacity: opacityAnim,
-                        transform: [{ scale: scaleAnim }],
-                    },
-                ]}
-            >
-                {isCompleted && !isActive ? (
-                    <Feather name="check" size={10} color={COLORS.black} />
-                ) : (
-                    <View style={isActive ? styles.activeDot : styles.inactiveDot} />
+        <View onLayout={onLayout} style={styles.nodeContainer} testID={`step-node-${stepKey}`}>
+            {status === 'active' && (
+                <Animated.View
+                    style={[
+                        styles.rippleRing,
+                        {
+                            transform: [{ scale: rippleScale }],
+                            opacity: rippleOpacity,
+                        },
+                    ]}
+                    pointerEvents="none"
+                />
+            )}
+            <Animated.View style={[
+                styles.nodePill,
+                {
+                    width: pillWidth,
+                    height: pillHeight,
+                    borderRadius: borderRadius,
+                    backgroundColor: bgScale.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [COLORS.lightGray, COLORS.black]
+                    })
+                }
+            ]}>
+                {iconData && (
+                    <Animated.View style={[StyleSheet.absoluteFill, styles.iconContainer, { opacity: iconOpacity }]}>
+                        <IconComponent name={iconData.name} size={20} color={COLORS.white} />
+                    </Animated.View>
                 )}
+                <Animated.View style={[StyleSheet.absoluteFill, styles.iconContainer, { opacity: checkOpacity }]}>
+                    <Feather name="check" size={12} color={COLORS.white} />
+                </Animated.View>
             </Animated.View>
         </View>
     );
 };
 
-StepIndicatorItem.propTypes = {
-    step: PropTypes.object.isRequired,
-    isActive: PropTypes.bool.isRequired,
-    isCompleted: PropTypes.bool.isRequired,
+AnimatedStepNode.propTypes = {
+    stepKey: PropTypes.string.isRequired,
+    status: PropTypes.oneOf(['future', 'active', 'completed']).isRequired,
+    onLayout: PropTypes.func,
 };
 
 // ---------------------------------------------------------------------------
 
-const StepIndicator = ({ currentIndex, totalSteps }) => {
+const StepIndicator = ({ currentIndex, totalSteps, onBack, rightAction }) => {
     const currentStepId = STEP_ORDER[currentIndex];
+    const scrollRef = useRef(null);
+    const nodePositions = useRef([]).current;
 
     // Animated progress bar — ratio 0..1, drives width %
     const progressRatio = useRef(
@@ -149,6 +200,14 @@ const StepIndicator = ({ currentIndex, totalSteps }) => {
             easing: Easing.out(Easing.cubic),
             useNativeDriver: false,
         }).start();
+
+        // Auto-scroll to active item
+        if (nodePositions[currentIndex] !== undefined) {
+            scrollRef.current?.scrollTo({
+                x: Math.max(0, nodePositions[currentIndex] - SCREEN_WIDTH / 2 + 22),
+                animated: true
+            });
+        }
     }, [currentIndex]);
 
     const animatedWidth = progressRatio.interpolate({
@@ -159,7 +218,7 @@ const StepIndicator = ({ currentIndex, totalSteps }) => {
     const getChapterData = (idx) => {
         if (idx <= 5) return { name: 'ABOUT YOU', current: idx + 1, total: 6 };
         if (idx <= 15) return { name: 'YOUR LIFE', current: idx - 5, total: 10 };
-        return { name: 'YOUR PHOTOS', current: idx - 15, total: 2 };
+        return { name: 'YOUR PHOTOS', current: idx - 15, total: 4 };
     };
 
     const chapter = getChapterData(currentIndex);
@@ -167,21 +226,32 @@ const StepIndicator = ({ currentIndex, totalSteps }) => {
 
     return (
         <View style={sharedStyles.stepIndicatorArea}>
-            <Text style={sharedStyles.chapterLabel}>{chapterLabel}</Text>
+            <View style={[styles.topRow, { paddingHorizontal: SPACING.xl }]}>
+                <View style={styles.leftAction}>
+                    {onBack && <BackButton onPress={onBack} />}
+                </View>
+                <Text style={[sharedStyles.chapterLabel, styles.chapterLabelText]} numberOfLines={1} ellipsizeMode="tail">
+                    {chapterLabel}
+                </Text>
+                <View style={styles.rightAction}>
+                    {rightAction}
+                </View>
+            </View>
             <ScrollView
+                ref={scrollRef}
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ gap: 12, paddingRight: 20 }}
+                contentContainerStyle={{ gap: 6, paddingHorizontal: SPACING.xl, alignItems: 'center' }}
                 style={styles.stepIconScroll}
             >
-                {STEP_CONFIG.map((step, idx) => {
-                    const stepIdx = STEP_ORDER.indexOf(step.id);
+                {STEP_ORDER.map((stepKey, idx) => {
+                    const status = idx === currentIndex ? 'active' : (idx < currentIndex ? 'completed' : 'future');
                     return (
-                        <StepIndicatorItem
-                            key={step.id}
-                            step={step}
-                            isActive={currentStepId === step.id}
-                            isCompleted={stepIdx < currentIndex}
+                        <AnimatedStepNode
+                            key={stepKey}
+                            stepKey={stepKey}
+                            status={status}
+                            onLayout={(e) => { nodePositions[idx] = e.nativeEvent.layout.x; }}
                         />
                     );
                 })}
@@ -199,50 +269,57 @@ const StepIndicator = ({ currentIndex, totalSteps }) => {
 };
 
 const styles = StyleSheet.create({
-    stepIconScroll: {
-        marginBottom: 16,
+    topRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: SPACING.md, // 16px
     },
-    itemWrapper: {
-        width: 28,
-        height: 28,
+    leftAction: {
+        width: 44,
+        alignItems: 'flex-start',
+    },
+    rightAction: {
+        width: 44,
+        alignItems: 'flex-end',
+        flexShrink: 0,
+    },
+    stepIconScroll: {
+        marginBottom: SPACING.md,
+        height: 44,
+    },
+    nodeContainer: {
+        width: 44,
+        height: 44,
         justifyContent: 'center',
         alignItems: 'center',
     },
     rippleRing: {
         position: 'absolute',
-        width: 28,
-        height: 28,
-        borderRadius: 14,
+        width: 44,
+        height: 44,
+        borderRadius: 22,
         borderWidth: 2,
         borderColor: COLORS.black,
     },
-    iconCircle: {
-        width: 20,
-        height: 20,
-        borderRadius: 10,
+    nodePill: {
+        width: 44, // Default fallback
+        height: 44,
+        borderRadius: 22,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'transparent',
+        overflow: 'hidden',
     },
-    iconCircleActive: {
-        // no extra visual — the activeDot + ripple communicate state
+    iconContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    iconCircleCompleted: {
-        backgroundColor: '#F3F4F6',
-        borderWidth: 1.5,
-        borderColor: '#D1D5DB',
-    },
-    activeDot: {
-        width: 8,
-        height: 8,
-        borderRadius: 4,
-        backgroundColor: COLORS.black,
-    },
-    inactiveDot: {
-        width: 6,
-        height: 6,
-        borderRadius: 3,
-        backgroundColor: '#9CA3AF',
+    chapterLabelText: {
+        flex: 1,
+        textAlign: 'center',
+        fontSize: 10, // Reduced from 11px
+        height: 20,
+        lineHeight: 20,
     },
 });
 

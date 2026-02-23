@@ -1,7 +1,7 @@
 export const STEP_ORDER = [
     'name', 'birthday', 'gender', 'sexuality', 'relationshipType', 'datingIntention', // Chapter 1: About You
     'height', 'hometown', 'workplace', 'education', 'school', 'religion', 'children', 'tobacco', 'drinking', 'location', // Chapter 2: Your Life
-    'photos', 'notifications' // Chapter 3: Your Photos
+    'photos', 'bio', 'verification', 'notifications' // Chapter 3: Your Photos
 ];
 
 export const STEP_CONFIG = [
@@ -22,13 +22,15 @@ export const STEP_CONFIG = [
     { id: 'drinking', icon: 'local-bar', library: 'MaterialIcons' },
     { id: 'location', icon: 'map-pin', library: 'Feather' },
     { id: 'photos', icon: 'photo-library', library: 'MaterialIcons' },
+    { id: 'bio', icon: 'edit', library: 'Feather' },
+    { id: 'verification', icon: 'verified-user', library: 'MaterialIcons' },
     { id: 'notifications', icon: 'bell', library: 'Feather' },
 ];
 
 export const CHAPTER_CONFIG = [
     { id: 'about', label: 'Chapter 1: About You', steps: ['name', 'birthday', 'gender', 'sexuality', 'relationshipType', 'datingIntention'] },
     { id: 'life', label: 'Chapter 2: Your Life', steps: ['height', 'hometown', 'workplace', 'education', 'school', 'religion', 'children', 'tobacco', 'drinking', 'location'] },
-    { id: 'photos', label: 'Chapter 3: Your Photos', steps: ['photos', 'notifications'] },
+    { id: 'photos', label: 'Chapter 3: Your Photos', steps: ['photos', 'bio', 'verification', 'notifications'] },
 ];
 
 export default { STEP_ORDER, STEP_CONFIG, CHAPTER_CONFIG };
