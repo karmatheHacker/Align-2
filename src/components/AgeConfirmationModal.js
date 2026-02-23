@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     },
     modalContainer: {
         width: '100%',
-        backgroundColor: COLORS.white,
+        backgroundColor: COLORS.surface,
         borderRadius: 24,
         overflow: 'hidden',
     },

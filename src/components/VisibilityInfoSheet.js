@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     sheetContainer: {
-        backgroundColor: COLORS.white,
+        backgroundColor: COLORS.surface,
         borderTopLeftRadius: 32,
         borderTopRightRadius: 32,
         paddingBottom: 48, // Bottom safe area + extra

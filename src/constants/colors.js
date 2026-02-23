@@ -10,7 +10,8 @@ const COLORS = {
     inactiveIcons: '#D1D5DB',
     inactiveBorder: '#E5E7EB',
     overlay: 'rgba(0,0,0,0.5)',
-    surface: '#F9FAFB',
+    surface: '#F0EAD6',
+    warmCream: '#F0EAD6',
     error: '#ef4444', // m-5: tokenised error colour
 };
 

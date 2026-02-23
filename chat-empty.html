@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Align - Empty Chat State</title>
+    <!-- BEGIN: External Resources -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet" />
+    <!-- END: External Resources -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'off-white': '#F5F2EB',
+                        'cobalt-blue': '#1A1AFF',
+                        'bauhaus-red': '#E03A2F',
+                        'cream': '#F5F2EB',
+                    },
+                    fontFamily: {
+                        'grotesk': ['"Space Grotesk"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style data-purpose="custom-typography">
+        .massive-title {
+            font-size: 120px;
+            line-height: 0.8;
+            letter-spacing: -0.05em;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        /* Bauhaus hard edge principle - no smoothing needed */
+        body {
+            -webkit-font-smoothing: none;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #F5F2EB;
+            overflow: hidden;
+            /* Prevent scrolling for the aesthetic lockup */
+        }
+    </style>
+    <style data-purpose="background-text-drift">
+        .drift-text {
+            position: absolute;
+            white-space: nowrap;
+            font-size: 14px;
+            font-weight: 700;
+            opacity: 0.08;
+            letter-spacing: 0.2em;
+            pointer-events: none;
+            z-index: 0;
+        }
+    </style>
+</head>
+
+<body class="font-grotesk h-screen w-full relative">
+    <!-- BEGIN: Background Decorations -->
+    <div data-purpose="faint-text-drift">
+        <div class="drift-text top-10 left-[-10%] uppercase">MESSAGES · CHAT · ALIGN · CONNECTION</div>
+        <div class="drift-text bottom-40 right-[-10%] uppercase">CONNECTION · ALIGN · CHAT · MESSAGES</div>
+    </div>
+    <!-- Red Accent Dot -->
+    <div class="absolute top-12 left-8 w-4 h-4 rounded-full bg-bauhaus-red z-10" data-purpose="accent-dot"></div>
+    <!-- END: Background Decorations -->
+
+    <!-- BEGIN: Main Content Area -->
+    <main class="h-full flex flex-col justify-center items-center relative px-6 overflow-hidden">
+        <!-- Central Cobalt Circle -->
+        <div class="absolute w-[340px] h-[340px] border-[12px] border-cobalt-blue rounded-full opacity-100 z-0"
+            data-purpose="quiet-space-visual"></div>
+
+        <!-- Massive Typography Bleed -->
+        <div class="relative z-10 w-full flex flex-col items-start translate-y-[-20px]" data-purpose="hero-typography">
+            <h1 class="massive-title text-black whitespace-nowrap -ml-4">
+                SILENCE.
+            </h1>
+            <!-- Instructional Subtext -->
+            <p class="mt-8 max-w-[200px] text-black font-light leading-tight text-lg" data-purpose="instructional-text">
+                Your connections will appear here once you've aligned.
+            </p>
+        </div>
+    </main>
+    <!-- END: Main Content Area -->
+
+    <!-- BEGIN: Fixed Footer Button -->
+    <footer class="fixed bottom-0 left-0 w-full p-6 bg-transparent">
+        <button onclick="window.location.href='index.html'"
+            class="w-full bg-black text-cream py-6 text-sm font-bold tracking-[0.2em] uppercase transition-colors active:bg-cobalt-blue"
+            data-purpose="primary-action-button">
+            Start Discovering
+        </button>
+    </footer>
+    <!-- END: Fixed Footer Button -->
+</body>
+
+</html>

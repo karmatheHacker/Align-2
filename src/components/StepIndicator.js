@@ -8,7 +8,8 @@ import { STEP_ICONS } from '../constants/stepIcons';
 import sharedStyles from '../styles/shared';
 import BackButton from './BackButton';
 import SPACING from '../constants/spacing';
-import { Dimensions } from 'react-native';
+import { Dimensions, StatusBar, Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -183,7 +184,8 @@ AnimatedStepNode.propTypes = {
 
 // ---------------------------------------------------------------------------
 
-const StepIndicator = ({ currentIndex, totalSteps, onBack, rightAction }) => {
+const StepIndicator = ({ currentIndex, totalSteps, onBack, rightAction, backgroundColor }) => {
+    const insets = useSafeAreaInsets();
     const currentStepId = STEP_ORDER[currentIndex];
     const scrollRef = useRef(null);
     const nodePositions = useRef([]).current;
@@ -210,6 +212,12 @@ const StepIndicator = ({ currentIndex, totalSteps, onBack, rightAction }) => {
         }
     }, [currentIndex]);
 
+    const statusBarHeight = insets.top > 0
+        ? insets.top
+        : Platform.OS === 'android'
+            ? StatusBar.currentHeight || 24
+            : 44;
+
     const animatedWidth = progressRatio.interpolate({
         inputRange: [0, 1],
         outputRange: ['0%', '100%'],
@@ -225,7 +233,13 @@ const StepIndicator = ({ currentIndex, totalSteps, onBack, rightAction }) => {
     const chapterLabel = `${chapter.name} · STEP ${chapter.current} OF ${chapter.total}`;
 
     return (
-        <View style={sharedStyles.stepIndicatorArea}>
+        <View style={[
+            styles.indicatorContainer,
+            {
+                paddingTop: statusBarHeight + 8,
+                backgroundColor: backgroundColor || COLORS.surface
+            }
+        ]}>
             <View style={[styles.topRow, { paddingHorizontal: SPACING.xl }]}>
                 <View style={styles.leftAction}>
                     {onBack && <BackButton onPress={onBack} />}
@@ -256,7 +270,7 @@ const StepIndicator = ({ currentIndex, totalSteps, onBack, rightAction }) => {
                     );
                 })}
             </ScrollView>
-            <View style={sharedStyles.progressRow}>
+            <View style={[sharedStyles.progressRow, styles.progressRowFull]}>
                 <View style={sharedStyles.progressTrack}>
                     <Animated.View
                         testID="progress-fill"
@@ -293,6 +307,7 @@ const styles = StyleSheet.create({
         height: 44,
         justifyContent: 'center',
         alignItems: 'center',
+        overflow: 'hidden',
     },
     rippleRing: {
         position: 'absolute',
@@ -317,15 +332,31 @@ const styles = StyleSheet.create({
     chapterLabelText: {
         flex: 1,
         textAlign: 'center',
-        fontSize: 10, // Reduced from 11px
+        fontSize: 10,
         height: 20,
         lineHeight: 20,
+        overflow: 'hidden',
+    },
+    progressRowFull: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 8,
+        paddingHorizontal: 0,
+        width: '100%',
+    },
+    indicatorContainer: {
+        paddingHorizontal: 0,
+        paddingBottom: SPACING.sm,
+        marginBottom: SPACING.xl,
     },
 });
 
 StepIndicator.propTypes = {
     currentIndex: PropTypes.number.isRequired,
     totalSteps: PropTypes.number.isRequired,
+    onBack: PropTypes.func,
+    rightAction: PropTypes.node,
+    backgroundColor: PropTypes.string,
 };
 
 export default StepIndicator;

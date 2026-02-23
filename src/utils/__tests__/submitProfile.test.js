@@ -5,6 +5,12 @@ global.fetch = jest.fn();
 describe('submitProfile', () => {
     beforeEach(() => {
         fetch.mockClear();
+        // Use a real (non-placeholder) URL so tests exercise the fetch path
+        process.env.EXPO_PUBLIC_API_URL = 'https://api.test.com/profile';
+    });
+
+    afterEach(() => {
+        delete process.env.EXPO_PUBLIC_API_URL;
     });
 
     const mockProfile = { firstName: 'John' };
@@ -37,5 +43,12 @@ describe('submitProfile', () => {
         fetch.mockRejectedValueOnce(networkError);
 
         await expect(submitProfile(mockProfile)).rejects.toThrow('Network failure');
+    });
+
+    it('returns mock success when no real API URL is configured', async () => {
+        delete process.env.EXPO_PUBLIC_API_URL;
+        const result = await submitProfile(mockProfile);
+        expect(result).toEqual({ success: true, mock: true });
+        expect(fetch).not.toHaveBeenCalled();
     });
 });

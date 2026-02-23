@@ -10,6 +10,10 @@ jest.mock('@expo/vector-icons', () => ({
     MaterialCommunityIcons: 'MaterialCommunityIcons',
 }));
 
+jest.mock('react-native-safe-area-context', () => ({
+    useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+}));
+
 describe('StepIndicator', () => {
     const totalSteps = 20; // Updated for 20-step flow (including bio and verification)
 

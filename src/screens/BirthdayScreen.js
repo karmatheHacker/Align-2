@@ -34,8 +34,13 @@ const BirthdayScreen = ({ onNext, digits, setDigits, onBack }) => {
     const isComplete = digits.every(d => d !== '');
 
     return (
-        <View style={sharedStyles.screenContainer}>
-            <StepIndicator currentIndex={currentIndex} totalSteps={totalSteps} onBack={onBack} />
+        <View style={[sharedStyles.screenContainer, { backgroundColor: COLORS.warmCream }]}>
+            <StepIndicator
+                currentIndex={currentIndex}
+                totalSteps={totalSteps}
+                onBack={onBack}
+                backgroundColor={COLORS.warmCream}
+            />
             <ScrollView contentContainerStyle={sharedStyles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
                 <PremiumScreenWrapper animateEntrance>
                     <View style={sharedStyles.content}>
@@ -78,7 +83,7 @@ const BirthdayScreen = ({ onNext, digits, setDigits, onBack }) => {
                     </View>
                 </PremiumScreenWrapper>
             </ScrollView>
-            <View style={sharedStyles.footer}>
+            <View style={[sharedStyles.footer, { backgroundColor: COLORS.warmCream }]}>
                 <Text style={sharedStyles.footerHelperText}>We use this to calculate the age on your profile.</Text>
                 <FAB
                     onPress={onNext}

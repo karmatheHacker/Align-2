@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
     },
     sheet: {
-        backgroundColor: COLORS.white,
+        backgroundColor: COLORS.surface,
         borderTopLeftRadius: 28,
         borderTopRightRadius: 28,
         paddingHorizontal: SPACING.xl,

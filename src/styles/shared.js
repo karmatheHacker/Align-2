@@ -14,6 +14,11 @@ const sharedStyles = StyleSheet.create({
     scrollContent: {
         flexGrow: 1,
         paddingHorizontal: SPACING.xl,
+        backgroundColor: COLORS.surface,
+    },
+    scrollView: {
+        flex: 1,
+        backgroundColor: COLORS.surface,
     },
     header: {
         paddingTop: SPACING.lg, // 24px per Task 3 (Top -> StepIndicator top)
@@ -116,9 +121,6 @@ const sharedStyles = StyleSheet.create({
         borderBottomWidth: 2,
         borderBottomColor: COLORS.black,
         marginBottom: SPACING.lg, // 24px
-    },
-    stepIndicatorArea: {
-        marginBottom: SPACING.xl, // 32px per Task 3 (Indicator -> Title)
     },
     chapterLabel: {
         fontFamily: 'Inter_600SemiBold',

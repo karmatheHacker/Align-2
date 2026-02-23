@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     whyLink: {
         fontFamily: 'Inter_600SemiBold',
         fontSize: 15,
-        color: COLORS.richPurple,
+        color: COLORS.black,
         textDecorationLine: 'underline',
     },
     visibilityContainer: {

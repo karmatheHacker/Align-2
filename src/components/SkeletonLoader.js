@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Animated, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import COLORS from '../constants/colors';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -41,7 +42,7 @@ const ShimmerBone = ({ width, height, borderRadius = 8, style }) => {
                 ]}
             >
                 <LinearGradient
-                    colors={['#E5E7EB', '#F3F4F6', '#E5E7EB']}
+                    colors={['#E8E2D0', '#F0EAD6', '#E8E2D0']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
                     style={StyleSheet.absoluteFill}
@@ -98,7 +99,7 @@ const SkeletonLoader = () => (
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F9FAFB',
+        backgroundColor: COLORS.surface,
         paddingHorizontal: 32,
         paddingTop: 56,
         paddingBottom: 48,
@@ -132,7 +133,7 @@ const styles = StyleSheet.create({
         paddingTop: 16,
     },
     bone: {
-        backgroundColor: '#E5E7EB',
+        backgroundColor: '#E8E2D0',
         overflow: 'hidden',
     },
 });
